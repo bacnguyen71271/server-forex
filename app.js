@@ -9,6 +9,7 @@ const roomSchema = new mongoose.Schema({
     userID:String,
     socketSesion: String,
     fullName:String,
+    groupName:String,
     status:String,
     masterOnline:Boolean
 })
@@ -134,6 +135,56 @@ io.on('connection',(socket)=>{
         })
     })
 
+    socket.on("reg_group",(data)=>{
+        room.find({userID:data.accountID}).exec((error,user)=>{
+            if(user.length < 1){
+                room.create({
+                    userID: data.accountID,
+                    fullName:data.name,
+                    groupName:data.groupname,
+                    status: "",
+                    masterOnline: false
+                });
+                socket.emit("reg_status","Đăng ký thành công Account ID "+ data.accountID);
+                room.find().exec((err,resurl)=>{
+                    socket.emit("danhsachroom",resurl);
+                })
+            }else{
+                socket.emit("reg_status","Account ID "+ data.accountID + " đã tồn tại");
+            }
+        })
+    })
+
+    socket.on("reg_user",(data)=>{
+        room.find({userID:data.accountID}).exec((error,user)=>{
+            if(user.length < 1){
+                listuser.create({
+                    userID:"15319332",
+                    fullName: "Nguyen Van Bac",
+                    room:''
+                });
+                socket.emit("reg_status","Đăng ký thành công Account ID "+ data.accountID);
+                listuser.find().exec((err,resurl)=>{
+                    socket.emit("danhsachroom",resurl);
+                })
+            }else{
+                socket.emit("reg_status","Account ID "+ data.accountID + " đã tồn tại");
+            }
+        })
+    })
+
+    socket.on("laydanhsachroom",(data)=>{
+        room.find().exec((err,resurl)=>{
+            socket.emit("danhsachroom",resurl);
+        })
+    });
+
+    socket.on("laydanhsachuser",(data)=>{
+        listuser.find().exec((err,resurl)=>{
+            socket.emit("danhsachroom",resurl);
+        })
+    });
+
     socket.on("changemaster",(data)=>{
         socket.leave(socket.Phong2);
         socket.join(data);
@@ -147,6 +198,10 @@ io.on('connection',(socket)=>{
     })
 })
 
-app.get('/',(req,res)=>{
-    res.render('trangchu');
+app.get('/addmaster',(req,res)=>{
+    res.render('addmaster');
+})
+
+app.get('/addslave',(req,res)=>{
+    res.render('addslave');
 })

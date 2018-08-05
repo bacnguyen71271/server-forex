@@ -1,0 +1,83 @@
+<html>
+    <head>
+        <title>Server</title>
+        <script src="jquery-3.3.1.min.js" ></script>
+        <script src="socket.io/socket.io.js"></script>
+
+        <script>
+        
+        var socket = io('http://localhost:3000');
+
+            socket.on("reg_status",(data)=>{
+                
+                alert(data);
+            });
+
+            socket.on("danhsachroom",(data)=>{
+                $(".danhsachmaster").html('');
+                $.each(data,(i,v)=>{
+                    $(".danhsachmaster").append("<div>");
+                    $(".danhsachmaster").append("<div class='idmaster'>"+v.userID+"</div>");
+                    $(".danhsachmaster").append("<div class='tenmaster'>"+v.fullName+"</div>");
+                    $(".danhsachmaster").append("<div class='tengroup'>"+v.groupName+"</div>");
+                    $(".danhsachmaster").append("</div>");
+                })
+            });
+
+        $(document).ready(()=>{
+            socket.emit("laydanhsachroom");
+
+            $("#submit").click(()=>{
+                if($("#accountid").val() === ""){
+                    alert("Hãy nhập Account ID trước");
+                    return;
+                }else if($("#name").val() === ""){
+                    alert("Hãy nhập tên của Master");
+                    return;
+                }else if($("#groupname").val() === ""){
+                    alert("Hãy nhập tên của nhóm này");
+                    return;
+                }else{
+                    socket.emit("reg_group",{accountID:$("#accountid").val(),name:$("#name").val(),groupname:$("#groupname").val()});
+                }
+                
+            })
+        })
+        
+        </script>
+
+        <style>
+            .idmaster {
+                font-size: 23px;
+                font-weight: 800;
+                color: #017951;
+            }
+            .tenmaster {
+                padding-left: 20px;
+                color: red;
+                font-size: 15px;
+                font-weight: 400;
+            }
+            .tengroup {
+                padding-left: 20px;
+                color: #070ca9;
+                font-size: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h3>Thêm Master</h3>
+            <input type="text" placeholder="Account ID" id="accountid"/>
+            <input type="text" placeholder="Name" id="name"/>
+            <input type="text" placeholder="Group Name" id="groupname"/>
+            <button type="button" id="submit" value="Đăng ký">Đăng ký</button>
+        </div>
+        <div>
+            <h3>Danh sách Master đã đăng ký</h3>
+            <div class="danhsachmaster">
+
+            </div>
+        </div>
+    </body>
+</html>
