@@ -43,7 +43,9 @@ listuser.create({
 */
 
 
-var server = app.listen(3000);
+var server = app.listen(process.env.PORT || 3000,()=>{
+    console.log(process.env.PORT || 3000);
+});
 
 var io = require('socket.io').listen(server);
 
