@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>Server</title>
+        <script src="jquery-3.3.1.min.js" ></script>
+        <script src="socket.io/socket.io.js"></script>
+
+        <script>
+        
+        var socket = io('http://localhost:3000');
+        $(document).ready(()=>{
+            $("#senddata").click(()=>{
+                socket.emit("sendData","Hello");
+            })
+        })
+        
+        </script>
+    </head>
+    <body>
+        <div id="senddata">Send</div>
+    </body>
+</html>

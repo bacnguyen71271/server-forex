@@ -1,0 +1,152 @@
+const express = require('express');
+const app = express();
+const mongoose = require("mongoose");
+
+mongoose.connect("mongodb://localhost/forex");
+
+//schema room
+const roomSchema = new mongoose.Schema({
+    userID:String,
+    socketSesion: String,
+    fullName:String,
+    status:String,
+    masterOnline:Boolean
+})
+
+//schema listUser
+const listuserSchema = new mongoose.Schema({
+    userID:String,
+    socketSesion: String,
+    fullName:String,
+    room:String
+})
+
+const room = mongoose.model('room',roomSchema);
+const listuser = mongoose.model('listuser',listuserSchema);
+
+/*
+room.create({
+    userID: '15278640',
+    fullName:"ADMIN",
+    status:"Room Online 19h hàng ngày",
+    masterOnline: true
+})
+
+
+
+listuser.create({
+    userID:"15319332",
+    fullName: "Nguyen Van Bac",
+    room:'15278640'
+})
+*/
+
+
+var server = app.listen(3000);
+
+var io = require('socket.io').listen(server);
+
+
+app.set('view engine','ejs');
+app.set('views','./views')
+app.use(express.static('public'));
+
+
+io.on('connection',(socket)=>{
+    console.log(socket.id + " : Ket noi");
+    socket.on("disconnect",()=>{
+        console.log(socket.id + " : Ngat ket noi");
+    })
+
+    socket.on("sendinfo",(data)=>{
+        room.find({userID:data.arr12}).exec((error,status)=>{
+            if(status[0].masterOnline){
+                io.sockets.in(data.arr12).emit("sendbid",data);
+                console.log("Vua gui " + data +" cho " +data.arr12 );
+            }else{
+                console.log("Master "+data.arr12 + " đã nghỉ chơi" );
+            }
+        })
+        
+    })
+
+
+    socket.on("online",(data)=>{
+        
+        room.find({userID : data}).exec((error,master)=>{
+            if(master.length >= 1){
+                socket.join(data);
+                //update socketSession
+                room.update({userID:data},{socketSesion:socket.id}).exec((error,resurl)=>{});
+                console.log("Master "+master[0].fullName+" vừa online");
+            }else{
+                listuser.find({userID:data}).exec((error,user)=>{
+                    if(user.length >= 1){
+                        if(user[0].room !== ""){
+                            listuser.update({userID:data},{socketSesion:socket.id}).exec((error,resurl)=>{});
+                            socket.join(user[0].room);    
+                            console.log("Người chơi "+user[0].userID+" vừa online và join vào room "+ user[0].room);
+                            console.log(socket.adapter.rooms)
+                        }else{
+                            console.log("Nguoi choi "+user[0].userID+" vừa online");
+                        }
+                    }else{
+                        console.log("Nguoi choi chua dang ky");
+                    }
+                })
+            }
+
+        })
+    })
+
+    socket.on("getUserOnline",(data)=>{
+        //console.log(socket.adapter.rooms.find(room));
+    })
+
+    socket.on("masteronline",(data)=>{
+        room.find({userID : data}).exec((error,user)=>{
+            if(user.length >= 1){
+                socket.join(data);
+                socket.Phong = data;
+                
+                room.update({userID: data},{masterOnline : true})
+                .exec((error,resurl)=>{
+                    console.log(resurl);
+                })
+
+                console.log("Master "+ data +" đã bật chế độ chơi");
+            }
+        })
+    })
+
+    socket.on("masteroffline",(data)=>{
+        room.find({userID : data}).exec((error,user)=>{
+            if(user !== undefined){
+
+                //thay doi trang thai master
+                room.update({userID: data},{masterOnline : false})
+                .exec((error,resurl)=>{
+                    console.log(resurl);
+                })
+
+                console.log("Master "+data+ " đã ngừng chơi");
+            }
+        })
+    })
+
+    socket.on("changemaster",(data)=>{
+        socket.leave(socket.Phong2);
+        socket.join(data);
+        socket.Phong2 = data;
+        listuser.update({userID: socket.userID},{room : data})
+        .exec((error,resurl)=>{
+            console.log(resurl);
+        })
+
+        console.log(socket.adapter.rooms)
+    })
+})
+
+app.get('/',(req,res)=>{
+    res.render('trangchu');
+})
