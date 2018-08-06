@@ -139,7 +139,7 @@ io.on('connection',(socket)=>{
             }
         })
     })
-
+   
     socket.on("reg_user",(data)=>{
         room.find({userID:data.accountID}).exec((error,user)=>{
             if(user.length < 1){
