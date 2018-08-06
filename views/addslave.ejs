@@ -10,19 +10,21 @@
 
             socket.on("reg_status",(data)=>{
                 alert(data);
+                socket.emit("laydanhsachuser");
             });
 
             socket.on("danhsachroom",(data)=>{
                 $(".danhsachmaster").html('');
                 $.each(data,(i,v)=>{
-                    $(".danhsachmaster").append("<div>");
-                    $(".danhsachmaster").append("<div class='idmaster'>"+v.userID+"</div>");
-                    $(".danhsachmaster").append("<div class='tenmaster'>"+v.fullName+"</div>");
-                    $(".danhsachmaster").append("</div>");
+                    $(".danhsachmaster").append("<div class='item' data="+v.userID+"><div class='idmaster'>"+v.userID+"</div><div class='tenmaster'>"+v.fullName+"</div></div>");
                 })
             });
 
         $(document).ready(()=>{
+            $(".item").click(()=>{
+                var comfirm = comfirm("Bạn muốn xóa người chơi: "+$(this).attr('data')+" ?");
+            })
+
             socket.emit("laydanhsachuser");
 
             $("#submit").click(()=>{

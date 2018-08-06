@@ -149,9 +149,6 @@ io.on('connection',(socket)=>{
                     room:''
                 });
                 socket.emit("reg_status","Đăng ký thành công Account ID "+ data.accountID);
-                listuser.find().exec((err,resurl)=>{
-                    socket.emit("danhsachroom",resurl);
-                })
             }else{
                 socket.emit("reg_status","Account ID "+ data.accountID + " đã tồn tại");
             }
