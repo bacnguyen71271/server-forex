@@ -25,23 +25,6 @@ const listuserSchema = new mongoose.Schema({
 const room = mongoose.model('room',roomSchema);
 const listuser = mongoose.model('listuser',listuserSchema);
 
-/*
-room.create({
-    userID: '15278640',
-    fullName:"ADMIN",
-    status:"Room Online 19h hàng ngày",
-    masterOnline: true
-})
-
-
-
-listuser.create({
-    userID:"15319332",
-    fullName: "Nguyen Van Bac",
-    room:'15278640'
-})
-*/
-
 
 var server = app.listen(process.env.PORT || 3000,()=>{
     console.log(process.env.PORT || 3000);
@@ -161,8 +144,8 @@ io.on('connection',(socket)=>{
         room.find({userID:data.accountID}).exec((error,user)=>{
             if(user.length < 1){
                 listuser.create({
-                    userID:"15319332",
-                    fullName: "Nguyen Van Bac",
+                    userID: data.accountID,
+                    fullName: data.name,
                     room:''
                 });
                 socket.emit("reg_status","Đăng ký thành công Account ID "+ data.accountID);
