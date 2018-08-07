@@ -22,9 +22,15 @@ const listuserSchema = new mongoose.Schema({
     room:String
 })
 
+const chatSchema = new mongoose.Schema({
+    roomID:String,
+    user:String,
+    content: String
+})
+
 const room = mongoose.model('room',roomSchema);
 const listuser = mongoose.model('listuser',listuserSchema);
-
+const chat = mongoose.model('chat',chatSchema);
 
 var server = app.listen(process.env.PORT || 3000,()=>{
     console.log(process.env.PORT || 3000);
@@ -184,6 +190,38 @@ io.on('connection',(socket)=>{
             socket.emit("danhsachroom",resurl);
         })
     });
+
+
+    function sendContent(room){
+        chat.find({roomID:room}).limit(50).exec((error,resul)=>{
+            socket.emit("noidungchat",resul);
+        })
+    }
+    
+    socket.on("sendchat",(data)=>{
+        room.find({socketSesion:socket.id}).exec((err,resurl)=>{
+            if(resurl.length > 0){
+                chat.create({
+                    roomID:resurl.userID,
+                    user:resurl.fullName,
+                    content:data
+                });
+                io.sockets.in(resurl.userID).emit("sendNoidungchat",{user:resurl.fullName,noidung:data});
+            }else{
+                listuser.find({socketSesion:socket.id}).exec((err,resurl)=>{
+                    if(resurl.length >0){
+                        chat.create({
+                            roomID:resurl.room,
+                            user:resurl.fullName,
+                            content:data
+                        });
+                        io.sockets.in(resurl.room).emit("sendNoidungchat",{user:resurl.fullName,noidung:data});
+                    }
+                })
+            }
+        })
+    });
+
 
     socket.on("changemaster",(data)=>{
         if(socket.Phong2 === data){
