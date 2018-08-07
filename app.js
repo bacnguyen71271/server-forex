@@ -101,8 +101,8 @@ io.on('connection',(socket)=>{
     })
 
     socket.on("masteronline",(data)=>{
-        room.find({userID : data}).exec((error,user)=>{
-            console.log(data);
+        room.find().exec((error,user)=>{
+            console.log(user);
             if(user.length >= 1){
                 socket.join(data);
                 socket.Phong = data;
