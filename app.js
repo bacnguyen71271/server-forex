@@ -254,7 +254,7 @@ io.on('connection',(socket)=>{
                 }else{
                     socket.leave(resr[0].room);
                     socket.join(data.idroom);
-                    listuser.update({userID: resr[0].room},{room : data.idroom})
+                    listuser.update({userID: data.userid},{room : data.idroom})
                     .exec((error,resurl)=>{
                         console.log(resurl);
                         room.find({userID:data},(error,resurl2)=>{
