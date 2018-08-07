@@ -9,8 +9,8 @@
         var socket = io('https://mforex.cf/'); 
 
             socket.on("reg_status",(data)=>{
-                
                 alert(data);
+                socket.emit("laydanhsachuser");
             });
 
             socket.on("danhsachroom",(data)=>{

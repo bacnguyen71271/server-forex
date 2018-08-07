@@ -103,13 +103,13 @@ io.on('connection',(socket)=>{
 
     socket.on("masteronline",(data)=>{
         room.find({userID : data}).exec((error,user)=>{
+            console.log(user);
             if(user.length >= 1){
                 socket.join(data);
                 socket.Phong = data;
-                
                 room.update({userID: data},{masterOnline : true})
                 .exec((error,resurl)=>{
-                    console.log(resurl);
+                    
                 })
 
                 console.log("Master "+ data +" đã bật chế độ chơi");
@@ -119,12 +119,11 @@ io.on('connection',(socket)=>{
 
     socket.on("masteroffline",(data)=>{
         room.find({userID : data}).exec((error,user)=>{
-            if(user !== undefined){
-
+            console.log(user);
+            if(user.length >= 1){
                 //thay doi trang thai master
                 room.update({userID: data},{masterOnline : false})
                 .exec((error,resurl)=>{
-                    console.log(resurl);
                 })
 
                 console.log("Master "+data+ " đã ngừng chơi");
@@ -137,6 +136,7 @@ io.on('connection',(socket)=>{
             if(user.length < 1){
                 room.create({
                     userID: data.accountID,
+                    socketSesion:"",
                     fullName:data.name,
                     groupName:data.groupname,
                     status: "",
@@ -157,6 +157,7 @@ io.on('connection',(socket)=>{
             if(user.length < 1){
                 listuser.create({
                     userID: data.accountID,
+                    socketSesion:"",
                     fullName: data.name,
                     room:''
                 });
