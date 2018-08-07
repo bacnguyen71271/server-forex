@@ -207,7 +207,7 @@ io.on('connection',(socket)=>{
             if(resurl.length > 0){
                 sendContent(resurl[0].userID);
             }else{
-                listuser.find({socketSesion:socket.id}).exec((err,resurl)=>{
+                listuser.find({userID:data}).exec((err,resurl)=>{
                     console.log(resurl);
                     if(resurl.length >0){
                         sendContent(resurl[0].room);
