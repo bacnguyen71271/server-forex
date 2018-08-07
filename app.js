@@ -245,14 +245,16 @@ io.on('connection',(socket)=>{
 
 
     socket.on("changemaster",(data)=>{
+        console.log(data.userid);
+        console.log(data.idroom);
         listuser.find({userID:data.userid}).exec((err,resr)=>{
             if(resr.length >0){
-                if(resr.room === data.idroom){
+                if(resr[0].room === data.idroom){
                     socket.emit("reg_status","Bạn đã ở trong phòng này !");
                 }else{
-                    socket.leave(resr.room);
+                    socket.leave(resr[0].room);
                     socket.join(data.idroom);
-                    listuser.update({userID: resr.room},{room : data.idroom})
+                    listuser.update({userID: resr[0].room},{room : data.idroom})
                     .exec((error,resurl)=>{
                         console.log(resurl);
                         room.find({userID:data},(error,resurl2)=>{
@@ -265,8 +267,6 @@ io.on('connection',(socket)=>{
                         })
                     })
                 }
-
-
             }
         })
 
