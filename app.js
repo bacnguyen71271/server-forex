@@ -202,24 +202,23 @@ io.on('connection',(socket)=>{
         console.log(data);
         room.find({socketSesion:socket.id}).exec((err,resurl)=>{
             if(resurl.length > 0){
-                io.sockets.in(resurl.userID).emit("sendnoidung","test");
+                //io.sockets.in(resurl.userID).emit("sendnoidung","test");
                 chat.create({
-                    roomID:resurl.userID,
-                    user:resurl.fullName,
+                    roomID:resurl[0].userID,
+                    user:resurl[0].fullName,
                     content:data
                 });
-                //io.sockets.in(resurl.userID).emit("sendNoidungchat",{user:resurl.fullName,noidung:data});
-                console.log(resurl);
+                io.sockets.in(resurl[0].userID).emit("sendNoidungchat",{user:resurl[0].fullName,noidung:data});
                 console.log(socket.id);
             }else{
                 listuser.find({socketSesion:socket.id}).exec((err,resurl)=>{
                     if(resurl.length >0){
                         chat.create({
-                            roomID:resurl.room,
-                            user:resurl.fullName,
+                            roomID:resurl[0].room,
+                            user:resurl[0].fullName,
                             content:data
                         });
-                        io.sockets.in(resurl.room).emit("sendnoidung",{user:resurl.fullName,noidung:data});
+                        io.sockets.in(resurl[0].room).emit("sendnoidung",{user:resurl[0].fullName,noidung:data});
                     }
                 })
             }
