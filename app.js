@@ -201,15 +201,16 @@ io.on('connection',(socket)=>{
     socket.on("sendchat",(data)=>{
         console.log(data);
         room.find({socketSesion:socket.id}).exec((err,resurl)=>{
-            console.log(resurl);
-            console.log(socket.id);
             if(resurl.length > 0){
+                io.sockets.in(resurl.userID).emit("sendNoidungchat","test");
                 chat.create({
                     roomID:resurl.userID,
                     user:resurl.fullName,
                     content:data
                 });
-                io.sockets.in(resurl.userID).emit("sendNoidungchat",{user:resurl.fullName,noidung:data});
+                //io.sockets.in(resurl.userID).emit("sendNoidungchat",{user:resurl.fullName,noidung:data});
+                console.log(resurl.userID);
+                console.log(socket.id);
             }else{
                 listuser.find({socketSesion:socket.id}).exec((err,resurl)=>{
                     if(resurl.length >0){
