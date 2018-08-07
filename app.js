@@ -201,7 +201,9 @@ io.on('connection',(socket)=>{
     }
     
     socket.on("laynoidungchat",(data)=>{
+        console.log(data);
         room.find({socketSesion:socket.id}).exec((err,resurl)=>{
+            console.log(resurl);
             if(resurl.length > 0){
                 sendContent(resurl[0].userID);
             }else{
