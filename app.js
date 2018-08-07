@@ -198,6 +198,20 @@ io.on('connection',(socket)=>{
         })
     }
     
+    socket.on("laynoidungchat",(data)=>{
+        room.find({socketSesion:socket.id}).exec((err,resurl)=>{
+            if(resurl.length > 0){
+                sendContent(resurl[0].userID);
+            }else{
+                listuser.find({socketSesion:socket.id}).exec((err,resurl)=>{
+                    if(resurl.length >0){
+                        sendContent(resurl[0].room);
+                    }
+                })
+            }
+        })
+    })
+
     socket.on("sendchat",(data)=>{
         room.find({socketSesion:socket.id}).exec((err,resurl)=>{
             if(resurl.length > 0){
