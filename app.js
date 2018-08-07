@@ -70,7 +70,6 @@ io.on('connection',(socket)=>{
     })
 
     socket.on("online",(data)=>{
-        
         room.find({userID : data}).exec((error,master)=>{
             if(master.length >= 1){
                 socket.join(data);
@@ -103,7 +102,7 @@ io.on('connection',(socket)=>{
 
     socket.on("masteronline",(data)=>{
         room.find({userID : data}).exec((error,user)=>{
-            console.log(user);
+            console.log(data);
             if(user.length >= 1){
                 socket.join(data);
                 socket.Phong = data;
@@ -119,7 +118,7 @@ io.on('connection',(socket)=>{
 
     socket.on("masteroffline",(data)=>{
         room.find({userID : data}).exec((error,user)=>{
-            console.log(user);
+            console.log(data);
             if(user.length >= 1){
                 //thay doi trang thai master
                 room.update({userID: data},{masterOnline : false})
