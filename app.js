@@ -186,15 +186,24 @@ io.on('connection',(socket)=>{
     });
 
     socket.on("changemaster",(data)=>{
-        socket.leave(socket.Phong2);
-        socket.join(data);
-        socket.Phong2 = data;
-        listuser.update({userID: socket.userID},{room : data})
-        .exec((error,resurl)=>{
-            console.log(resurl);
-        })
-
-        console.log(socket.adapter.rooms)
+        if(socket.Phong2 === data){
+            socket.emit("reg_status","Bạn đã ở trong phòng này !");
+        }else{
+            socket.leave(socket.Phong2);
+            socket.join(data);
+            socket.Phong2 = data;
+            listuser.update({userID: socket.userID},{room : data})
+            .exec((error,resurl)=>{
+                room.find({userID:data},(error,resurl2)=>{
+                    if(resurl2.length>0){
+                        console.log("User: "+socket.userID+ " đã join room "+resurl2[0].groupName)
+                        socket.emit("titleroom",resurl2[0].groupName);
+                    }else{
+                        
+                    }
+                })
+            })
+        }
     })
 })
 
