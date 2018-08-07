@@ -245,25 +245,32 @@ io.on('connection',(socket)=>{
 
 
     socket.on("changemaster",(data)=>{
-        if(socket.Phong2 === data){
-            socket.emit("reg_status","Bạn đã ở trong phòng này !");
-        }else{
-            socket.leave(socket.Phong2);
-            socket.join(data);
-            socket.Phong2 = data;
-            listuser.update({userID: socket.userID},{room : data})
-            .exec((error,resurl)=>{
-                console.log(resurl);
-                room.find({userID:data},(error,resurl2)=>{
-                    if(resurl2.length>0){
-                        console.log("User: "+socket.userID+ " đã join room "+resurl2[0].groupName)
-                        socket.emit("titleroom",resurl2[0].groupName);
-                    }else{
-                        
-                    }
-                })
-            })
-        }
+        listuser.find({userID:data.userid}).exec((err,resr)=>{
+            if(resr.length >0){
+                if(resr.room === data.idroom){
+                    socket.emit("reg_status","Bạn đã ở trong phòng này !");
+                }else{
+                    socket.leave(resr.room);
+                    socket.join(data.idroom);
+                    listuser.update({userID: resr.room},{room : data.idroom})
+                    .exec((error,resurl)=>{
+                        console.log(resurl);
+                        room.find({userID:data},(error,resurl2)=>{
+                            if(resurl2.length>0){
+                                console.log("User: "+socket.userID+ " đã join room "+resurl2[0].groupName)
+                                socket.emit("titleroom",resurl2[0].groupName);
+                            }else{
+                                
+                            }
+                        })
+                    })
+                }
+
+
+            }
+        })
+
+        
     })
 })
 
