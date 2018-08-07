@@ -251,10 +251,9 @@ io.on('connection',(socket)=>{
             socket.leave(socket.Phong2);
             socket.join(data);
             socket.Phong2 = data;
-            listuser.update({userID: socket.userID},{room : data}).exec((err,resul)=>{
-                console.log(resul);
-            })
+            listuser.update({userID: socket.userID},{room : data})
             .exec((error,resurl)=>{
+                console.log(resurl);
                 room.find({userID:data},(error,resurl2)=>{
                     if(resurl2.length>0){
                         console.log("User: "+socket.userID+ " đã join room "+resurl2[0].groupName)
