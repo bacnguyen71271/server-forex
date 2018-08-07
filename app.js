@@ -46,11 +46,13 @@ io.on('connection',(socket)=>{
 
     socket.on("sendinfo",(data)=>{
         room.find({userID:data.arr12}).exec((error,status)=>{
-            if(status[0].masterOnline){
-                io.sockets.in(data.arr12).emit("sendbid",data);
-                console.log("Vua gui " + data +" cho " +data.arr12 );
-            }else{
-                console.log("Master "+data.arr12 + " đã nghỉ chơi" );
+            if(status.length>0){
+                if(status[0].masterOnline){
+                    io.sockets.in(data.arr12).emit("sendbid",data);
+                    console.log("Vua gui " + data +" cho " +data.arr12 );
+                }else{
+                    console.log("Master "+data.arr12 + " đã nghỉ chơi" );
+                }
             }
         })
         
