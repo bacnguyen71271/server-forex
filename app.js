@@ -201,6 +201,8 @@ io.on('connection',(socket)=>{
     socket.on("sendchat",(data)=>{
         console.log(data);
         room.find({socketSesion:socket.id}).exec((err,resurl)=>{
+            console.log(resurl);
+            console.log(socket.id);
             if(resurl.length > 0){
                 chat.create({
                     roomID:resurl.userID,
