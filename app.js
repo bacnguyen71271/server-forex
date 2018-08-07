@@ -251,7 +251,9 @@ io.on('connection',(socket)=>{
             socket.leave(socket.Phong2);
             socket.join(data);
             socket.Phong2 = data;
-            listuser.update({userID: socket.userID},{room : data})
+            listuser.update({userID: socket.userID},{room : data}).exec((err,resul)=>{
+                console.log(resul);
+            })
             .exec((error,resurl)=>{
                 room.find({userID:data},(error,resurl2)=>{
                     if(resurl2.length>0){
