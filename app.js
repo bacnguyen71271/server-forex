@@ -63,6 +63,12 @@ io.on('connection',(socket)=>{
         })
     })
 
+    socket.on("deleteMaster",(data)=>{
+        listuser.deleteMany({userID:data},(err,resurl)=>{
+            socket.emit("reg_status","Đã xóa master "+ data);
+        })
+    })
+
     socket.on("online",(data)=>{
         
         room.find({userID : data}).exec((error,master)=>{

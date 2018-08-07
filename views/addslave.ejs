@@ -16,7 +16,7 @@
             socket.on("danhsachroom",(data)=>{
                 $(".danhsachmaster").html('');
                 $.each(data,(i,v)=>{
-                    $(".danhsachmaster").append("<div class='item'><div class='info'>ID Master: <div class='idmaster'>"+v.userID+"</div>Tên master: <div class='tenmaster'>"+v.fullName+"</div></div><div class='delete' onclick='deteleUser("+v.userID+")'>Xóa</div</div>");
+                    $(".danhsachmaster").append("<div class='item'><div class='info'>ID Người chơi: <div class='idmaster'>"+v.userID+"</div>Tên Người chơi: <div class='tenmaster'>"+v.fullName+"</div></div><div class='delete' onclick='deteleUser("+v.userID+")'>Xóa</div</div>");
                 })
             });
 
