@@ -101,8 +101,8 @@ io.on('connection',(socket)=>{
     })
 
     socket.on("masteronline",(data)=>{
-        room.find().exec((error,user)=>{
-            console.log(user);
+        room.find({userID : data}).exec((error,user)=>{
+            console.log(data);
             if(user.length >= 1){
                 socket.join(data);
                 socket.Phong = data;
@@ -112,6 +112,8 @@ io.on('connection',(socket)=>{
                 })
 
                 console.log("Master "+ data +" đã bật chế độ chơi");
+            }else{
+                socket.emit("reg_status","Master "+data+" chưa đăng ký. Hãy liên hệ với người chủ quản để tham gia đội ngũ chuyên gia");
             }
         })
     })
@@ -126,6 +128,8 @@ io.on('connection',(socket)=>{
                 })
 
                 console.log("Master "+data+ " đã ngừng chơi");
+            }else{
+                socket.emit("reg_status","Master "+data+" chưa đăng ký. Hãy liên hệ với người chủ quản để tham gia đội ngũ chuyên gia");
             }
         })
     })
