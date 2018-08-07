@@ -199,7 +199,6 @@ io.on('connection',(socket)=>{
     }
     
     socket.on("sendchat",(data)=>{
-        console.log(data);
         room.find({socketSesion:socket.id}).exec((err,resurl)=>{
             if(resurl.length > 0){
                 //io.sockets.in(resurl.userID).emit("sendnoidung","test");
@@ -208,8 +207,8 @@ io.on('connection',(socket)=>{
                     user:resurl[0].fullName,
                     content:data
                 });
-                io.sockets.in(resurl[0].userID).emit("sendNoidungchat",{user:resurl[0].fullName,noidung:data});
-                console.log(socket.id);
+                io.sockets.in(resurl[0].userID).emit("sendnoidung",{user:resurl[0].fullName,noidung:data});
+                console.log(resurl[0].userID);
             }else{
                 listuser.find({socketSesion:socket.id}).exec((err,resurl)=>{
                     if(resurl.length >0){
