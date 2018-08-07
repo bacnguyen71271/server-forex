@@ -193,7 +193,9 @@ io.on('connection',(socket)=>{
 
 
     function sendContent(room){
+        console.log(room);
         chat.find({roomID:room}).limit(50).exec((error,resul)=>{
+            console.log(resul);
             socket.emit("noidungchat",resul);
         })
     }
