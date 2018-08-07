@@ -257,7 +257,7 @@ io.on('connection',(socket)=>{
                     listuser.update({userID: data.userid},{room : data.idroom})
                     .exec((error,resurl)=>{
                         console.log(resurl);
-                        room.find({userID:data},(error,resurl2)=>{
+                        room.find({userID:data.idroom},(error,resurl2)=>{
                             if(resurl2.length>0){
                                 console.log("User: "+socket.userID+ " đã join room "+resurl2[0].groupName)
                                 socket.emit("titleroom",resurl2[0].groupName);
