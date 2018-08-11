@@ -200,6 +200,7 @@ io.on('connection',(socket)=>{
         })
     }
     
+    /*
     socket.on("laynoidungchat",(data)=>{
         console.log("laynoidungchat"+data);
         room.find({socketSesion:socket.id}).exec((err,resurl)=>{
@@ -216,7 +217,9 @@ io.on('connection',(socket)=>{
             }
         })
     })
+*/
 
+/*
     socket.on("sendchat",(data)=>{
         room.find({socketSesion:socket.id}).exec((err,resurl)=>{
             if(resurl.length > 0){
@@ -242,7 +245,7 @@ io.on('connection',(socket)=>{
             }
         })
     });
-
+*/
 
     socket.on("changemaster",(data)=>{
         console.log(data.userid);
