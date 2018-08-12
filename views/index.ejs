@@ -2,13 +2,30 @@
 <head>
     <title>Forex Tool</title>
     <link rel="stylesheet" type="text/css" href="/public/style.css" />
+    <script src="jquery-3.3.1.min.js" ></script>
+    <script src="socket.io/socket.io.js"></script>
+
+    <script>
+        var socket = io('https://mforex.cf/'); 
+
+        socket.on("listmasterOnline",(data)=>{
+                $(".danhsachmaster").html('');
+                $.each(data,(i,v)=>{
+                    $(".danhsachmaster").append("<div class='item'><div class='info'>ID Người chơi: <div class='idmaster'>"+v.userID+"</div>Tên Người chơi: <div class='tenmaster'>"+v.fullName+"</div></div><div class='delete' onclick='deteleUser("+v.userID+")'>Xóa</div></div>");
+                })
+            });
+
+        $(document).ready(()=>{
+            socket.emit("getMasterOnline");
+        });
+    </script>
 </head>
 <body>
     <header>
 
     </header>
-    <div class="body">
-        <h2>Forex Tool</h2>
+    <div class="danhsachmaster">
+        
     </div>
 </body>
 </html> 

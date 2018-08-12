@@ -11,7 +11,8 @@ const roomSchema = new mongoose.Schema({
     fullName:String,
     groupName:String,
     status:String,
-    masterOnline:Boolean
+    masterOnline:Boolean,
+    
 })
 
 //schema listUser
@@ -39,6 +40,8 @@ var server = app.listen(process.env.PORT || 3000,()=>{
 var io = require('socket.io').listen(server);
 
 
+
+
 app.set('view engine','ejs');
 app.set('views','./views')
 app.use(express.static('public'));
@@ -48,6 +51,14 @@ io.on('connection',(socket)=>{
     console.log(socket.id + " : Ket noi");
     socket.on("disconnect",()=>{
         console.log(socket.id + " : Ngat ket noi");
+        room.find({socketSesion : socket.id}).exec((error,master)=>{
+            if(master.length >= 1){
+                //update socketSession
+                room.update({socketSesion : socket.id},{status:"offline"}).exec((error,resurl)=>{});
+                console.log("Master "+master[0].fullName+" vừa disconnect");
+            }
+        });
+
     })
 
     socket.on("sendinfo",(data)=>{
@@ -77,12 +88,22 @@ io.on('connection',(socket)=>{
         })
     })
 
+
+    socket.on("getMasterOnline",()=>{
+        rom.find({masterOnline:true,status:"online"}).exec((resurl)=>{
+            var listMaster = [];
+            if(resurl.length > 0){
+                socket.emit("listmasterOnline",resurl);
+            }
+        })
+    });
+
     socket.on("online",(data)=>{
         room.find({userID : data}).exec((error,master)=>{
             if(master.length >= 1){
                 socket.join(data);
                 //update socketSession
-                room.update({userID:data},{socketSesion:socket.id}).exec((error,resurl)=>{});
+                room.update({userID:data},{socketSesion:socket.id,status:"online"}).exec((error,resurl)=>{});
                 console.log("Master "+master[0].fullName+" vừa online");
             }else{
                 listuser.find({userID:data}).exec((error,user)=>{
@@ -91,7 +112,7 @@ io.on('connection',(socket)=>{
                             listuser.update({userID:data},{socketSesion:socket.id}).exec((error,resurl)=>{});
                             socket.join(user[0].room);    
                             console.log("Người chơi "+user[0].userID+" vừa online và join vào room "+ user[0].room);
-                            console.log(socket.adapter.rooms)
+                            //console.log(socket.adapter.rooms)
                         }else{
                             console.log("Nguoi choi "+user[0].userID+" vừa online");
                         }
@@ -118,7 +139,6 @@ io.on('connection',(socket)=>{
                 .exec((error,resurl)=>{
                     
                 })
-
                 console.log("Master "+ data +" đã bật chế độ chơi");
             }else{
                 socket.emit("reg_status","Master "+data+" chưa đăng ký. Hãy liên hệ với người chủ quản để tham gia đội ngũ chuyên gia");
@@ -138,7 +158,7 @@ io.on('connection',(socket)=>{
                 console.log("Master "+data+ " đã ngừng chơi");
             }else{
                 socket.emit("reg_status","Master "+data+" chưa đăng ký. Hãy liên hệ với người chủ quản để tham gia đội ngũ chuyên gia");
-            }
+            } 
         })
     })
 
