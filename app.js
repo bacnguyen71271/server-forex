@@ -105,7 +105,7 @@ io.on('connection',(socket)=>{
 
 
     socket.on("getMasterOnline",()=>{
-        room.find({masterOnline:true}).exec((resurl)=>{
+        room.find({masterOnline:true,status:"online"}).exec((err,resurl)=>{
             console.log(resurl);
             var listMaster = [];
             if(resurl !== null){
