@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const mongoose = require("mongoose");
+var router = express.Router();
 
 mongoose.connect("mongodb://127.0.0.1:27017/forex");
 
@@ -46,8 +47,18 @@ app.set('view engine','ejs');
 app.set('views','./views')
 app.use(express.static('public'));
 
+app.get('/addmaster',(req,res)=>{
+    res.render('addmaster');
+})
+
+app.get('/addslave',(req,res)=>{
+    res.render('addslave');
+})
 
 
+app.get('/list',(req,res)=>{
+    res.render('index');
+})
 
 
 
