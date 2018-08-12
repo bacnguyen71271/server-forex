@@ -8,6 +8,10 @@
     <script>
         var socket = io('https://mforex.cf/'); 
 
+        setInterval(()=>{
+            socket.emit("getMasterOnline");
+        },3000);
+
         socket.on("listmasterOnline",(data)=>{
                 $(".danhsachmaster").html('');
                 $.each(data,(i,v)=>{
@@ -51,6 +55,7 @@
     <header>
 
     </header>
+    <div class="title">Danh sách master Online</div>
     <div class="danhsachmaster">
         
     </div>
