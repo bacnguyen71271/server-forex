@@ -109,9 +109,7 @@ io.on('connection',(socket)=>{
             console.log(resurl);
             var listMaster = [];
             if(resurl !== null){
-                if(resurl.length){
-                    socket.emit("listmasterOnline",resurl);
-                }
+                socket.emit("listmasterOnline",resurl);
             }
         })
     });
