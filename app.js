@@ -221,7 +221,7 @@ io.on('connection',(socket)=>{
         room.find().exec((err,resurl)=>{
             var dsroom = [];
             for(var i=0;i<resurl.length;i++){
-                if(resurl[i].masterOnline || resurl[i].status === "online"){
+                if(resurl[i].masterOnline && resurl[i].status === "online"){
                     dsroom.push({fullName:resurl[i].fullName,userID:resurl[i].userID,groupName:resurl[i].groupName,status:"<div class='green'></div>"});
                 }else{
                     dsroom.push({fullName:resurl[i].fullName,userID:resurl[i].userID,groupName:resurl[i].groupName,status:"<div class='red'></div>"});
