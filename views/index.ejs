@@ -15,7 +15,7 @@
         socket.on("danhsachroom",(data)=>{
                 $(".danhsachmaster").html('');
                 $.each(data,(i,v)=>{
-                    $(".danhsachmaster").append("<div class='item'><div class='info'>Tên nhóm: <div class='idmaster'>"+v.groupName+"</div>Tên Người chơi: <div class='tenmaster'>"+v.fullName+"</div></div></div>");
+                    $(".danhsachmaster").append("<div class='item'><div class='info'>Tên nhóm: <div class='idmaster'>"+v.groupName+"</div>Tên Người chơi: <div class='tenmaster'>"+v.fullName+"</div>"+v.status+"</div></div>");
                 })
             });
 
@@ -55,7 +55,6 @@
     <header>
 
     </header>
-    <div class="title">Danh sách master Online</div>
     <div class="danhsachmaster">
         
     </div>
