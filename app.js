@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const mongoose = require("mongoose");
-var router = express.Router();
 
 mongoose.connect("mongodb://127.0.0.1:27017/forex");
 
@@ -46,7 +45,11 @@ var io = require('socket.io').listen(server);
 app.set('view engine','ejs');
 app.set('views','./views')
 app.use(express.static('public'));
-app.use('/*', router);
+
+
+
+
+
 
 io.on('connection',(socket)=>{
     console.log(socket.id + " : Ket noi");
@@ -297,13 +300,5 @@ io.on('connection',(socket)=>{
 
         
     })
-})
-
-app.get('/addmaster',(req,res)=>{
-    res.render('addmaster');
-})
-
-app.get('/addslave',(req,res)=>{
-    res.render('addslave');
 })
 
