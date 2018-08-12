@@ -9,7 +9,7 @@
 
         setInterval(()=>{
             socket.emit("laydanhsachroom");
-        },3000);
+        },5000);
 
         socket.on("danhsachroom",(data)=>{
                 $(".danhsachmaster").html('');
@@ -43,6 +43,12 @@
         left: 214px;
         top: 47px;
     }
+
+    .item {
+        position: relative;
+    }
+
+
     .info {
         float: left;
     }
