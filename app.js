@@ -306,6 +306,6 @@ app.get('/addslave',(req,res)=>{
     res.render('addslave');
 })
 
-app.get('/*',(req,res)=>{
-    res.render('index');
+app.get('/list',(req,res)=>{
+    res.render('addslave');
 })
