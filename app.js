@@ -42,7 +42,6 @@ var io = require('socket.io').listen(server);
 
 
 
-
 app.set('view engine','ejs');
 app.set('views','./views')
 app.use(express.static('public'));
@@ -91,6 +90,16 @@ io.on('connection',(socket)=>{
     })
 
 
+    socket.on("getTrangThaiMaster",(data)=>{
+        room.find({userID:data}).exec((err,data)=>{
+            if(data[0].masterOnline&& data[0].status ==="online"){
+                socket.emit("sendTrangThaiMasTer",true);
+            }else{
+                socket.emit("sendTrangThaiMasTer",false);
+            }
+        })
+    })
+
     socket.on("deleteUser",(data)=>{
         listuser.deleteMany({userID:data},(err,resurl)=>{
             socket.emit("reg_status","Đã xóa user "+ data);
@@ -102,9 +111,8 @@ io.on('connection',(socket)=>{
             socket.emit("reg_status","Đã xóa master "+ data);
         })
     })
+    
 
-
- 
 
     socket.on("online",(data)=>{
         room.find({userID : data}).exec((error,master)=>{
@@ -120,6 +128,9 @@ io.on('connection',(socket)=>{
                             listuser.update({userID:data},{socketSesion:socket.id}).exec((error,resurl)=>{});
                             socket.join(user[0].room);    
                             console.log("Người chơi "+user[0].userID+" vừa online và join vào room "+ user[0].room);
+                            room.find({userID:user[0].room}).exec((error,data)=>{
+                                socket.emit("sendRoomName",data[0].groupName);
+                            })
                             //console.log(socket.adapter.rooms)
                         }else{
                             console.log("Nguoi choi "+user[0].userID+" vừa online");
@@ -308,8 +319,8 @@ io.on('connection',(socket)=>{
                         console.log(resurl);
                         room.find({userID:data.idroom},(error,resurl2)=>{
                             if(resurl2.length>0){
-                                console.log("User: "+socket.userID+ " đã join room "+resurl2[0].groupName)
-                                socket.emit("titleroom",resurl2[0].groupName);
+                                console.log("User: "+socket.userID+ " đã join room "+resurl2[0].groupName);
+                                socket.emit("sendRoomName",resurl2[0].groupName);
                             }else{
                                 
                             }
