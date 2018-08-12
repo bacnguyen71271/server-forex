@@ -104,15 +104,7 @@ io.on('connection',(socket)=>{
     })
 
 
-    socket.on("getMasterOnline",()=>{
-        room.find({masterOnline:true,status:"online"}).exec((err,resurl)=>{
-            console.log(resurl);
-            var listMaster = [];
-            if(resurl !== null){
-                socket.emit("listmasterOnline",resurl);
-            }
-        })
-    });
+ 
 
     socket.on("online",(data)=>{
         room.find({userID : data}).exec((error,master)=>{
@@ -215,9 +207,27 @@ io.on('connection',(socket)=>{
         })
     })
 
+    socket.on("getMasterOnline",()=>{
+        room.find({masterOnline:true,status:"online"}).exec((err,resurl)=>{
+            //console.log(resurl);
+            var listMaster = [];
+            if(resurl !== null){
+                socket.emit("listmasterOnline",resurl);
+            }
+        })
+    });
+
     socket.on("laydanhsachroom",(data)=>{
         room.find().exec((err,resurl)=>{
-            socket.emit("danhsachroom",resurl);
+            var dsroom = [];
+            for(var i=0;i<resurl.length;i++){
+                if(resurl[i].masterOnline || resurl[i].status === "online"){
+                    dsroom.push({fullName:resurl[i].fullName,userID:resurl[i].userID,groupName:resurl[i].groupName,status:"<div class='green'></div>"});
+                }else{
+                    dsroom.push({fullName:resurl[i].fullName,userID:resurl[i].userID,groupName:resurl[i].groupName,status:"<div class='red'></div>"});
+                }
+            }
+            socket.emit("danhsachroom",dsroom);
         })
     });
 

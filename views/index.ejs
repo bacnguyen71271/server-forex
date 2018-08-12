@@ -9,10 +9,10 @@
         var socket = io('https://mforex.cf/'); 
 
         setInterval(()=>{
-            socket.emit("getMasterOnline");
+            socket.emit("laydanhsachroom");
         },3000);
 
-        socket.on("listmasterOnline",(data)=>{
+        socket.on("danhsachroom",(data)=>{
                 $(".danhsachmaster").html('');
                 $.each(data,(i,v)=>{
                     $(".danhsachmaster").append("<div class='item'><div class='info'>Tên nhóm: <div class='idmaster'>"+v.groupName+"</div>Tên Người chơi: <div class='tenmaster'>"+v.fullName+"</div></div></div>");
@@ -20,7 +20,7 @@
             });
 
         $(document).ready(()=>{
-            socket.emit("getMasterOnline");
+            socket.emit("laydanhsachroom");
         });
     </script>   
   
