@@ -227,6 +227,7 @@ io.on('connection',(socket)=>{
             }
         })
     });
+//mới vcl
 
     socket.on("laydanhsachroom",(data)=>{
         room.find().exec((err,resurl)=>{
