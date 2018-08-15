@@ -93,7 +93,7 @@ io.on('connection',(socket)=>{
 
 
     socket.on("getTrangThaiMaster",(data)=>{
-        room.find({userID:data}).exec((err,data)=>{
+        rooms.find({userID:data}).exec((err,data)=>{
             console.log(data);
             
             if(data[0].masterOnline === undefined ){
