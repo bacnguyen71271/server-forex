@@ -93,10 +93,10 @@ io.on('connection',(socket)=>{
 
 
     socket.on("getTrangThaiMaster",(data)=>{
-        rooms.find({userID:data}).exec((err,data)=>{
+        room.find({userID:data}).exec((err,data)=>{
             console.log(data);
             
-            if(data[0].masterOnline === undefined ){
+            if(data.length > 0 ){
                 if(data[0].masterOnline && data[0].status ==="online"){
                     socket.emit("sendTrangThaiMasTer",true);
                 }else{
