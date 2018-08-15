@@ -94,10 +94,12 @@ io.on('connection',(socket)=>{
 
     socket.on("getTrangThaiMaster",(data)=>{
         room.find({userID:data}).exec((err,data)=>{
-            if(data[0].masterOnline&& data[0].status ==="online"){
-                socket.emit("sendTrangThaiMasTer",true);
-            }else{
-                socket.emit("sendTrangThaiMasTer",false);
+            if(data != null){
+                if(data[0].masterOnline&& data[0].status ==="online"){
+                    socket.emit("sendTrangThaiMasTer",true);
+                }else{
+                    socket.emit("sendTrangThaiMasTer",false);
+                }
             }
         })
     })
