@@ -68,7 +68,9 @@ io.on('connection',(socket)=>{
         room.find({socketSesion : socket.id}).exec((error,master)=>{
             if(master.length >= 1){
                 //update socketSession
-                room.update({socketSesion : socket.id},{status:"offline"}).exec((error,resurl)=>{});
+                room.update({userID:master[0].userID},{status:"offline"}).exec((error,resurl)=>{
+                    console.log(resurl);
+                });
                 console.log("Master "+master[0].fullName+" vừa disconnect");
             }
         });
@@ -119,7 +121,9 @@ io.on('connection',(socket)=>{
             if(master.length >= 1){
                 socket.join(data);
                 //update socketSession
-                room.update({userID:data},{socketSesion:socket.id,status:"online"}).exec((error,resurl)=>{});
+                room.update({userID:master[0].userID},{socketSesion:socket.id,status:"online"}).exec((error,resurl)=>{
+                    console.log(resurl);
+                });
                 console.log("Master "+master[0].fullName+" vừa online");
             }else{
                 listuser.find({userID:data}).exec((error,user)=>{
