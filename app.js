@@ -91,10 +91,11 @@ io.on('connection',(socket)=>{
         
     })
 
-
+/*
     socket.on("getTrangThaiMaster",(data)=>{
         room.find({userID:data}).exec((err,data)=>{
             console.log(data);
+            
             if(data[0].masterOnline === undefined ){
                 if(data[0].masterOnline && data[0].status ==="online"){
                     socket.emit("sendTrangThaiMasTer",true);
@@ -106,7 +107,7 @@ io.on('connection',(socket)=>{
             }
         })
     })
-
+*/
     socket.on("deleteUser",(data)=>{
         listuser.deleteMany({userID:data},(err,resurl)=>{
             socket.emit("reg_status","Đã xóa user "+ data);
