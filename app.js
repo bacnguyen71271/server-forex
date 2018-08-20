@@ -1,7 +1,11 @@
 const express = require('express');
 const app = express();
 const mongoose = require("mongoose");
-var router = express.Router();
+const bodyParser = require("body-parser");
+const session = require('express-session');
+const Passport = require("passport");
+const LocalStrategy = require('passport-local').Strategy;
+const crypto = require('crypto-js');
 
 mongoose.connect("mongodb://127.0.0.1:27017/forex");
 
@@ -13,7 +17,7 @@ const roomSchema = new mongoose.Schema({
     groupName:String,
     status:String,
     masterOnline:Boolean,
-    
+    leaderName:String
 })
 
 //schema listUser
@@ -21,7 +25,8 @@ const listuserSchema = new mongoose.Schema({
     userID:String,
     socketSesion: String,
     fullName:String,
-    room:String
+    room:String,
+    leaderName:String
 })
 
 const chatSchema = new mongoose.Schema({
@@ -30,21 +35,33 @@ const chatSchema = new mongoose.Schema({
     content: String
 })
 
+
+const leaderSchema = new mongoose.Schema({
+    leaderName: String,
+    passwordLeader: String,
+    statusLeader: String,
+    expirationdate: Date
+})
+
+const leader = mongoose.model('leader',leaderSchema);
 const room = mongoose.model('room',roomSchema);
 const listuser = mongoose.model('listuser',listuserSchema);
 const chat = mongoose.model('chat',chatSchema);
 
-var server = app.listen(process.env.PORT || 3000,()=>{
-    console.log(process.env.PORT || 3000);
-});
-
-var io = require('socket.io').listen(server);
-
+leader.create({leaderName:"admin",passwordLeader:"e10adc3949ba59abbe56e057f20f883e",statusLeader:"01678956166",expirationdate:new Date(2018,09,20).toLocaleDateString()});
 
 
 app.set('view engine','ejs');
 app.set('views','./views')
-app.use(express.static('public'));
+app.use("/public",express.static(__dirname + "/public"));
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(session({secret:"mysecret"}));
+app.use(Passport.initialize());
+app.use(Passport.session());
+
+app.get('/',(req,res)=>{
+    res.render('trangchu');
+})
 
 app.get('/addmaster',(req,res)=>{
     res.render('addmaster');
@@ -54,11 +71,56 @@ app.get('/addslave',(req,res)=>{
     res.render('addslave');
 })
 
-
-app.get('/list',(req,res)=>{
-    res.render('index');
+app.get('/leaderADD',(req,res)=>{
+    res.render('leaderadd');
 })
 
+app.get('/leader',(req,res)=>{
+    if(req.isAuthenticated()){
+        res.render('leadermanager');
+    }else{
+        res.redirect('login');
+    }
+})
+
+app.get('/login',(req,res)=>res.render('login'));
+app.post('/login',Passport.authenticate('local',{failureRedirect:'/login',successRedirect:'/leader'}));
+
+
+
+Passport.use(new LocalStrategy(
+    (username,password,done)=>{
+        leader.find({leaderName:username,passwordLeader:crypto.MD5(password).toString()}).exec((err,data)=>{
+            if(data.length <= 0){
+                return done(null,false);
+            }else{
+                return done(null,data[0]);
+            }
+        })
+    }
+))
+
+Passport.serializeUser((user,done)=>{
+    done(null,user.leaderName);
+})
+
+
+Passport.deserializeUser((name,done)=>{
+    leader.find({leaderName:name}).exec((error,data)=>{
+        if(data.length > 0){
+            return done(null,data[0]);
+        }else
+        {
+            return done(null,false);
+        }
+    })
+})
+
+var server = app.listen(process.env.PORT || 3000,()=>{
+    console.log(process.env.PORT || 3000);
+});
+
+var io = require('socket.io').listen(server);
 
 
 io.on('connection',(socket)=>{
