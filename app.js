@@ -337,6 +337,12 @@ io.on('connection',(socket)=>{
             userrrr = socket.request.session.passport['user'];
         }else{
             userrrr = data;
+
+            listuser.find({userID:data}).exec((err,data2)=>{
+                if(data.length > 0 ){
+                    userrrr = data2[0].leaderName;
+                }
+            })
         }
         console.log(userrrr);
         room.find({leaderName:userrrr}).exec((err,resurl)=>{
