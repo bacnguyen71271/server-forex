@@ -289,7 +289,7 @@ io.on('connection',(socket)=>{
                     groupName:data.groupname,
                     status: "",
                     masterOnline: false,
-                    leaderName:leaderUser
+                    leaderName:socket.request.session.passport['user']
                 });
                 socket.emit("reg_status","Đăng ký thành công Account ID "+ data.accountID);
                 room.find().exec((err,resurl)=>{
@@ -309,7 +309,7 @@ io.on('connection',(socket)=>{
                     socketSesion:"",
                     fullName: data.name,
                     room:'',
-                    leaderName:leaderUser
+                    leaderName:socket.request.session.passport['user']
                 });
                 socket.emit("reg_status","Đăng ký thành công Account ID "+ data.accountID);
             }else{
