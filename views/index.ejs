@@ -41,19 +41,20 @@
 
 
     <script>
-        var socket = io('https://mforex.cf/'); 
-/*
+        var socket = io('https://mforex.cf'); 
+
         setInterval(()=>{
             socket.emit("laydanhsachroom");
+            socket.emit("laydanhsachuser");
         },5000);
-*/
+
         socket.on("danhsachroom",(data)=>{
                 $(".danhsachmaster").html('');
                 $.each(data,(i,v)=>{
                     if(v.status === "<div class='red'></div>"){
-                        $(".danhsachmaster").append('<div class="col-xs-6 col-md-3 group hover-bg"><div class="hover-text"><button class="btn btn-custom-2 btn-lg" onclick="deteleMaster('+v.userID+')">Delete</button></div>  <i class="fa fa-users display"></i><h3>'+v.groupName+'</h3><p>'+v.fullName+'</p></div');
+                        $(".danhsachmaster").append('<div class="col-xs-6 col-md-3 group hover-bg"><div class="hover-text"><button class="btn btn-custom-2 btn-lg" onclick="deteleMaster('+v.userID+')">Delete</button></div>  <i class="fa fa-users display"></i><h3>'+v.groupName+'</h3><p>'+v.userID+' | '+v.fullName+'</p></div');
                     }else{
-                        $(".danhsachmaster").append('<div class="col-xs-6 col-md-3 group hover-bg"><div class="hover-text"><button class="btn btn-custom-2 btn-lg" onclick="deteleMaster('+v.userID+')">Delete</button></div>  <i class="fa fa-users"></i><h3>'+v.groupName+'</h3><p>'+v.fullName+'</p></div');
+                        $(".danhsachmaster").append('<div class="col-xs-6 col-md-3 group hover-bg"><div class="hover-text"><button class="btn btn-custom-2 btn-lg" onclick="deteleMaster('+v.userID+')">Delete</button></div>  <i class="fa fa-users"></i><h3>'+v.groupName+'</h3><p>'+v.userID+' | '+v.fullName+'</p></div');
                     }
                 })
             });
@@ -61,22 +62,68 @@
          socket.on("danhsachslave",(data)=>{
                 $(".danhsachslave").html('');
                 $.each(data,(i,v)=>{
-                    $(".danhsachslave").append("<div class='item'><div class='info'>ID Người chơi: <div class='idmaster'>"+v.userID+"</div>Tên Người chơi: <div class='tenmaster'>"+v.fullName+"</div></div><div class='delete' onclick='deteleUser("+v.userID+")'>Xóa</div></div>");
+                   $(".danhsachslave").append('<div class="col-xs-2 col-md-2 group hover-bg"><div class="hover-text"><button class="btn btn-custom-2 btn-lg" onclick="deteleUser('+v.userID+')">Delete</button></div>  <i class="fa fa-user slave-display"></i><h3>'+v.fullName+'</h3><p>'+v.userID+'</p></div');
+                    //$(".danhsachslave").append("<div class='item'><div class='info'>ID Người chơi: <div class='idmaster'>"+v.userID+"</div>Tên Người chơi: <div class='tenmaster'>"+v.fullName+"</div></div><div class='delete' onclick='deteleUser("+v.userID+")'>Xóa</div></div>");
                 })
             });
             
-
          function deteleMaster(data){
                 if(confirm("Bạn muốn xóa master: "+data+" ?")){
                     socket.emit("deleteMaster",data);
                 }
+          }
+
+          function deteleUser(data){
+                if(confirm("Bạn muốn xóa người chơi: "+data+" ?")){
+                    socket.emit("deleteUser",data);
+                }
             }
+
+        socket.on("reg_status",(data)=>{
+                alert(data);
+                socket.emit("laydanhsachroom");
+                socket.emit("laydanhsachuser");
+        });
 
 
         $(document).ready(()=>{
             socket.emit("laydanhsachroom");
+            socket.emit("laydanhsachuser");
+
             $("#submit-master").click(()=>{
-                socket.emit("reg_group",{accountID:$("#accountid").val(),name:$("#name").val(),groupname:$("#groupname").val()});
+                if($("#accountid").val() === ""){
+                  alert("Hãy nhập Account ID trước");
+                  return;
+                }else if($("#name").val() === ""){
+                  alert("Hãy nhập tên của Master");
+                  return;
+                }else if($("#groupname").val() === ""){
+                  alert("Hãy nhập tên của nhóm này");
+                  return;
+                }else{
+                  if(confirm("Bạn muốn thêm Master : "+$("#name").val()+ "/"+$("#accountid").val()+ " ?")){
+                    socket.emit("reg_group",{accountID:$("#accountid").val(),name:$("#name").val(),groupname:$("#groupname").val()});
+                    $("#accountid").val('');
+                    $("#name").val('');
+                    $("#groupname").val('');
+                  }
+                }
+            })
+
+            $("#submit-slave").click(()=>{
+                if($("#accountid-slave").val() === ""){
+                  alert("Hãy nhập Account ID trước");
+                  return;
+                }else if($("#name-slave").val() === ""){
+                  alert("Hãy nhập tên của người chơi");
+                  return;
+                }else{
+                  if(confirm("Bạn muốn thêm người chơi : "+$("#name-slave").val()+ "/"+$("#accountid-slave").val()+ " ?")){
+                    socket.emit("reg_user",{accountID:$("#accountid-slave").val(),name:$("#name-slave").val()});
+                    $("#accountid-slave").val('');
+                    $("#name-slave").val('');
+                  }
+                }
             })
 
         });
@@ -90,22 +137,23 @@
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </button>
-      <a class="navbar-brand page-scroll" href="#page-top">Leader Manager</a> </div>
+      <a class="navbar-brand page-scroll">Leader Manager</a> </div>
     
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#features" class="page-scroll">List Master</a></li>
-        <li><a href="#portfolio" class="page-scroll">List Slave</a></li>
-        <li><a href="#contact" class="page-scroll">Add Master/Add Slave</a></li>
-        <li><a href="/leader" class="page-scroll active">Logout</a></li>
+        <li><a href="#masterlist" class="page-scroll">List Master</a></li>
+        <li><a href="#slavelist" class="page-scroll">List Slave</a></li>
+        <li><a href="#add" class="page-scroll">Add Master/Add Slave</a></li>
+        <li><a href="/changepwd" class="page-scroll">Change Pwd</a></li>
+        <li><a href="/logout" class="page-scroll active">Logout</a></li>
       </ul>
     </div>
     <!-- /.navbar-collapse --> 
   </div>
 </nav>
 <!-- Features Section -->
-<div id="features" class="text-center">
+<div id="masterlist" class="text-center">
   <div class="container">
     <div class="col-md-10 col-md-offset-1 section-title">
       <h2>List Master</h2>
@@ -118,7 +166,7 @@
   </div>
 </div>
 <!-- About Section -->
-<div id="portfolio" class="text-center">
+<div id="slavelist" class="text-center">
     <div class="container">
       <div class="col-md-10 col-md-offset-1 section-title">
         <h2>List Slave</h2>
@@ -131,7 +179,7 @@
     </div>
   </div>
 <!-- Contact Section -->
-<div id="contact">
+<div id="add">
   <div class="container">
     <div class="col-md-6">
         <div class="row">
@@ -139,23 +187,23 @@
             <h2>Add Master</h2>
             <p>Hãy điền mã của master, tên thật và tên nhóm của họ. Sau đó bấm thêm</p>
           </div>
-          <form name="sentMessage" id="contactForm" novalidate>
+          <form name="sentMessage" id="contactForm" onsubmit="return false">
             <div class="row">
               <div class="col-md-10">
                 <div class="form-group">
-                  <input type="text" id="accountid" class="form-control" placeholder="Tài khoản Forex" required="required">
+                  <input type="text" id="accountid" class="form-control" placeholder="Tài khoản Forex" required>
                   <p class="help-block text-danger"></p>
                 </div>
               </div>
               <div class="col-md-10">
                 <div class="form-group">
-                  <input type="email" id="name" class="form-control" placeholder="Tên thật" required="required">
+                  <input type="text" id="name" class="form-control" placeholder="Tên thật" required>
                   <p class="help-block text-danger"></p>
                 </div>
               </div>
               <div class="col-md-10">
                 <div class="form-group">
-                  <input type="email" id="groupname" class="form-control" placeholder="Tên nhóm " required="required">
+                  <input type="text" id="groupname" class="form-control" placeholder="Tên nhóm " required>
                   <p class="help-block text-danger"></p>
                 </div>
               </div>
@@ -172,24 +220,24 @@
             <h2>Add Slave</h2>
             <p>Hãy điền mã của slave, tên thật. Sau đó bấm thêm</p>
         </div>
-          <form name="sentMessage" id="contactForm" novalidate>
+          <form name="sentMessage" id="contactForm" onsubmit="return false">
             <div class="row">
               <div class="col-md-10">
                 <div class="form-group">
-                  <input type="text" id="name" class="form-control" placeholder="Name" required="required">
+                  <input type="text" id="accountid-slave" class="form-control" placeholder="Tài khoản Forex" >
                   <p class="help-block text-danger"></p>
                 </div>
               </div>
               <div class="col-md-10">
                 <div class="form-group">
-                  <input type="email" id="email" class="form-control" placeholder="Email" required="required">
+                  <input type="text" id="name-slave" class="form-control" placeholder="Tên thật" >
                   <p class="help-block text-danger"></p>
                 </div>
               </div>
             </div>
             
             <div id="success"></div>
-            <button type="submit" class="btn btn-custom btn-lg">Thêm Slave</button>
+            <button type="submit" id="submit-slave" class="btn btn-custom btn-lg">Thêm Slave</button>
           </form>
         </div>
       </div>
@@ -200,9 +248,10 @@
 <!-- Footer Section -->
 <div id="footer">
   <div class="container text-center">
-    <p>&copy; 2018 mForex. Design by <a href="http://www.templatewire.com" rel="nofollow">TemplateWire</a></p>
+    <p>&copy; 2018 mForex. Design by <a href="https://www.facebook.com/bac.nguyen.71271" rel="nofollow">BacNguyen</a></p>
   </div>
 </div>
+
 <script type="text/javascript" src="public/js/jquery.1.11.1.js"></script> 
 <script type="text/javascript" src="public/js/bootstrap.js"></script> 
 <script type="text/javascript" src="public/js/SmoothScroll.js"></script> 
@@ -210,5 +259,11 @@
 <script type="text/javascript" src="public/js/jqBootstrapValidation.js"></script> 
 <script type="text/javascript" src="public/js/contact_me.js"></script> 
 <script type="text/javascript" src="public/js/main.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+
 </body>
 </html>

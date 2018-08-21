@@ -7,6 +7,15 @@ const Passport = require("passport");
 const LocalStrategy = require('passport-local').Strategy;
 const crypto = require('crypto-js');
 
+
+var sessionMiddleware = session({
+    name: "COOKIE_NAME_HERE",
+    secret: "COOKIE_SECRET_HERE",
+    store: new (require("connect-mongo")(session))({
+        url: "mongodb://127.0.0.1:27017/forex"
+    })
+});
+
 mongoose.connect("mongodb://127.0.0.1:27017/forex");
 
 //schema room
@@ -49,30 +58,45 @@ const listuser = mongoose.model('listuser',listuserSchema);
 const chat = mongoose.model('chat',chatSchema);
 
 //leader.create({leaderName:"admin",passwordLeader:"e10adc3949ba59abbe56e057f20f883e",statusLeader:"01678956166",expirationdate:new Date(2018,09,20).toLocaleDateString()});
-
+var leaderUser = '';
 
 app.set('view engine','ejs');
 app.set('views','./views')
 app.use("/public",express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(session({secret:"mysecret"}));
+//app.use(session({secret:"mysecret"}));
+app.use(sessionMiddleware);
 app.use(Passport.initialize());
 app.use(Passport.session());
+
+
 
 app.get('/',(req,res)=>{
     res.render('trangchu');
 })
 
-app.get('/addmaster',(req,res)=>{
-    res.render('addmaster');
+app.get('/logout',(req,res)=>{
+    req.logout();
+    res.redirect('/');
 })
 
-app.get('/addslave',(req,res)=>{
-    res.render('addslave');
+app.get('/leaderadd/:user',(req,res)=>{
+    leader.find({leaderName:req.params.user}).exec((err,data)=>{
+        if(data.length <= 0){
+            leader.create({leaderName:req.params.user,passwordLeader:"123456",statusLeader:"01678956166",expirationdate:new Date(2018,09,20).toLocaleDateString()});
+            res.send("Thêm thành công")
+        }else{
+            res.send('Tài khoản Leader "' +req.params.user + '" đã tồn tại')
+        }
+    })
 })
 
-app.get('/leaderADD',(req,res)=>{
-    res.render('leaderadd');
+app.get('/changepwd',(req,res)=>{
+    if(req.isAuthenticated()){
+        res.render('changepwd');
+    }else{
+        res.redirect('login');
+    }
 })
 
 app.get('/leader',(req,res)=>{
@@ -81,16 +105,20 @@ app.get('/leader',(req,res)=>{
     }else{
         res.redirect('login');
     }
+
+    if(req.session.passport !== undefined){
+        leaderUser = req.session.passport['user'];
+    }
 })
+
 
 app.get('/login',(req,res)=>res.render('login'));
 app.post('/login',Passport.authenticate('local',{failureRedirect:'/login',successRedirect:'/leader'}));
 
 
-
 Passport.use(new LocalStrategy(
     (username,password,done)=>{
-        leader.find({leaderName:username,passwordLeader:crypto.MD5(password).toString()}).exec((err,data)=>{
+        leader.find({leaderName:username,passwordLeader:password}).exec((err,data)=>{
             if(data.length <= 0){
                 return done(null,false);
             }else{
@@ -120,7 +148,12 @@ var server = app.listen(process.env.PORT || 3000,()=>{
     console.log(process.env.PORT || 3000);
 });
 
-var io = require('socket.io').listen(server);
+var io = require('socket.io')(server)
+
+io.use(function(socket, next){
+    // Wrap the express middleware
+    sessionMiddleware(socket.request, {}, next);
+});
 
 
 io.on('connection',(socket)=>{
@@ -156,8 +189,6 @@ io.on('connection',(socket)=>{
 
     socket.on("getTrangThaiMaster",(data)=>{
         room.find({userID:data}).exec((err,data)=>{
-            console.log(data);
-            
             if(data.length > 0 ){
                 if(data[0].masterOnline && data[0].status ==="online"){
                     socket.emit("sendTrangThaiMasTer",true);
@@ -182,15 +213,13 @@ io.on('connection',(socket)=>{
         })
     })
     
-
-
+  
     socket.on("online",(data)=>{
         room.find({userID : data}).exec((error,master)=>{
             if(master.length >= 1){
                 socket.join(data);
                 //update socketSession
                 room.update({userID:master[0].userID},{socketSesion:socket.id,status:"online"}).exec((error,resurl)=>{
-                    console.log(resurl);
                 });
                 console.log("Master "+master[0].fullName+" vừa online");
             }else{
@@ -216,9 +245,6 @@ io.on('connection',(socket)=>{
         })
     })
 
-    socket.on("getUserOnline",(data)=>{
-        //console.log(socket.adapter.rooms.find(room));
-    })
 
     socket.on("masteronline",(data)=>{
         room.find({userID : data}).exec((error,user)=>{
@@ -262,7 +288,8 @@ io.on('connection',(socket)=>{
                     fullName:data.name,
                     groupName:data.groupname,
                     status: "",
-                    masterOnline: false
+                    masterOnline: false,
+                    leaderName:leaderUser
                 });
                 socket.emit("reg_status","Đăng ký thành công Account ID "+ data.accountID);
                 room.find().exec((err,resurl)=>{
@@ -281,7 +308,8 @@ io.on('connection',(socket)=>{
                     userID: data.accountID,
                     socketSesion:"",
                     fullName: data.name,
-                    room:''
+                    room:'',
+                    leaderName:leaderUser
                 });
                 socket.emit("reg_status","Đăng ký thành công Account ID "+ data.accountID);
             }else{
@@ -302,6 +330,14 @@ io.on('connection',(socket)=>{
 //mới vcl
 
     socket.on("laydanhsachroom",(data)=>{
+        
+        var userrrr = '';
+        
+        if(socket.request.session.passport !== undefined){
+            userrrr = socket.request.session.passport['user'];
+        }else{
+            userrrr = data;
+        }
         room.find().exec((err,resurl)=>{
             var dsroom = [];
             for(var i=0;i<resurl.length;i++){
@@ -316,10 +352,25 @@ io.on('connection',(socket)=>{
     });
 
     socket.on("laydanhsachuser",(data)=>{
-        listuser.find().exec((err,resurl)=>{
-            socket.emit("danhsachroom",resurl);
-        })
+        if(socket.request.session.passport !== undefined)
+        {
+            listuser.find({leaderName:socket.request.session.passport['user']}).exec((err,resurl)=>{
+                socket.emit("danhsachslave",resurl);
+            })
+        }
     });
+
+
+    socket.on("change_pass",(data)=>{
+        leader.find({leaderName:socket.request.session.passport['user'],passwordLeader:data.oldpass}).exec((errr,data2)=>{
+            if(data2.length > 0 ){
+                leader.update({leaderName:data2[0].leaderName},{passwordLeader:data.newpasss}).exec((err,data3)=>{})
+                socket.emit("reg_status","Đổi mật khẩu thành công");
+            }else{
+                socket.emit("reg_status","Mật khẩu không đúng");
+            }
+        })
+    })
 
 
     function sendContent(room){
