@@ -10,9 +10,14 @@ body {
   background: -moz-linear-gradient(-45deg, #5b5476, #3cb4ab);
   background: linear-gradient(-45deg, #5b5476, #3cb4ab);
 }
+
+*{
+  margin: auto;
+  padding: auto;
+}
 .form-contact {
   width: 400px;
-  margin: 30% auto;
+  margin: auto;
   padding: 60px 50px 60px 50px;
   background-color: rgba(255, 255, 255, 0.25);
   box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.15);

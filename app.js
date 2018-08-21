@@ -48,7 +48,7 @@ const room = mongoose.model('room',roomSchema);
 const listuser = mongoose.model('listuser',listuserSchema);
 const chat = mongoose.model('chat',chatSchema);
 
-leader.create({leaderName:"admin",passwordLeader:"e10adc3949ba59abbe56e057f20f883e",statusLeader:"01678956166",expirationdate:new Date(2018,09,20).toLocaleDateString()});
+//leader.create({leaderName:"admin",passwordLeader:"e10adc3949ba59abbe56e057f20f883e",statusLeader:"01678956166",expirationdate:new Date(2018,09,20).toLocaleDateString()});
 
 
 app.set('view engine','ejs');
@@ -77,7 +77,7 @@ app.get('/leaderADD',(req,res)=>{
 
 app.get('/leader',(req,res)=>{
     if(req.isAuthenticated()){
-        res.render('leadermanager');
+        res.render('index');
     }else{
         res.redirect('login');
     }
