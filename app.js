@@ -344,7 +344,7 @@ io.on('connection',(socket)=>{
                 }
             })
         }
-        console.log(userrrr);
+        console.log("----"+userrrr);
         room.find({leaderName:userrrr}).exec((err,resurl)=>{
             var dsroom = [];
             for(var i=0;i<resurl.length;i++){
