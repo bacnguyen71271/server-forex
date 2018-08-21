@@ -339,7 +339,7 @@ io.on('connection',(socket)=>{
             userrrr = data;
         }
         console.log(userrrr);
-        room.find().exec((err,resurl)=>{
+        room.find({leaderName:userrrr}).exec((err,resurl)=>{
             var dsroom = [];
             for(var i=0;i<resurl.length;i++){
                 if(resurl[i].masterOnline && resurl[i].status === "online"){
