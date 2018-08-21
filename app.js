@@ -338,6 +338,7 @@ io.on('connection',(socket)=>{
         }else{
             userrrr = data;
         }
+        console.log(userrrr);
         room.find({leaderName:userrrr}).exec((err,resurl)=>{
             var dsroom = [];
             for(var i=0;i<resurl.length;i++){
