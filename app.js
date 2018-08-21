@@ -343,9 +343,10 @@ io.on('connection',(socket)=>{
                 if(data2.length > 0 ){
                     userrrr = data2[0].leaderName;
                 }
+                console.log("3----"+userrrr);
             })
         }
-        console.log("----"+userrrr);
+        console.log("4----"+userrrr);
         room.find({leaderName:userrrr}).exec((err,resurl)=>{
             var dsroom = [];
             for(var i=0;i<resurl.length;i++){
