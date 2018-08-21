@@ -337,8 +337,9 @@ io.on('connection',(socket)=>{
             userrrr = socket.request.session.passport['user'];
         }else{
             userrrr = data;
-
+            console.log("1----"+userrrr);
             listuser.find({userID:data}).exec((err,data2)=>{
+                console.log("2----"+data2);
                 if(data2.length > 0 ){
                     userrrr = data2[0].leaderName;
                 }
