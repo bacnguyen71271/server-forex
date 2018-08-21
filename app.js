@@ -334,30 +334,36 @@ io.on('connection',(socket)=>{
         var userrrr = '';
         
         if(socket.request.session.passport !== undefined){
-            userrrr = socket.request.session.passport['user'];
+            room.find({leaderName:socket.request.session.passport['user']}).exec((err,resurl)=>{
+                var dsroom = [];
+                for(var i=0;i<resurl.length;i++){
+                    if(resurl[i].masterOnline && resurl[i].status === "online"){
+                        dsroom.push({fullName:resurl[i].fullName,userID:resurl[i].userID,groupName:resurl[i].groupName,status:"<div class='green'></div>"});
+                    }else{
+                        dsroom.push({fullName:resurl[i].fullName,userID:resurl[i].userID,groupName:resurl[i].groupName,status:"<div class='red'></div>"});
+                    }
+                }
+                socket.emit("danhsachroom",dsroom);
+            })
         }else{
             userrrr = data;
-            console.log("1----"+userrrr);
             listuser.find({userID:data}).exec((err,data2)=>{
-                console.log("2----"+data2);
                 if(data2.length > 0 ){
-                    userrrr = data2[0].leaderName;
+                    room.find({leaderName:data2[0].leaderName}).exec((err,resurl)=>{
+                        var dsroom = [];
+                        for(var i=0;i<resurl.length;i++){
+                            if(resurl[i].masterOnline && resurl[i].status === "online"){
+                                dsroom.push({fullName:resurl[i].fullName,userID:resurl[i].userID,groupName:resurl[i].groupName,status:"<div class='green'></div>"});
+                            }else{
+                                dsroom.push({fullName:resurl[i].fullName,userID:resurl[i].userID,groupName:resurl[i].groupName,status:"<div class='red'></div>"});
+                            }
+                        }
+                        socket.emit("danhsachroom",dsroom);
+                    })
                 }
-                console.log("3----"+userrrr);
             })
         }
-        console.log("4----"+userrrr);
-        room.find({leaderName:userrrr}).exec((err,resurl)=>{
-            var dsroom = [];
-            for(var i=0;i<resurl.length;i++){
-                if(resurl[i].masterOnline && resurl[i].status === "online"){
-                    dsroom.push({fullName:resurl[i].fullName,userID:resurl[i].userID,groupName:resurl[i].groupName,status:"<div class='green'></div>"});
-                }else{
-                    dsroom.push({fullName:resurl[i].fullName,userID:resurl[i].userID,groupName:resurl[i].groupName,status:"<div class='red'></div>"});
-                }
-            }
-            socket.emit("danhsachroom",dsroom);
-        })
+        
     });
 
     socket.on("laydanhsachuser",(data)=>{
