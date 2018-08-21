@@ -339,7 +339,7 @@ io.on('connection',(socket)=>{
             userrrr = data;
 
             listuser.find({userID:data}).exec((err,data2)=>{
-                if(data.length > 0 ){
+                if(data2.length > 0 ){
                     userrrr = data2[0].leaderName;
                 }
             })
